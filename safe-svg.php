@@ -38,7 +38,7 @@ if ( ! class_exists( 'safeSvg' ) ) {
             add_filter( 'wp_get_attachment_image_src', [ $this, 'onePixelFix' ], 10, 4 );
             add_filter( 'admin_post_thumbnail_html', [ $this, 'featuredImageFix' ], 10, 3 );
             add_action( 'admin_enqueue_scripts', [ $this, 'loadCustomAdminStyle' ] );
-            add_action( 'get_image_tag', [ $this, 'getTmageTagOverride' ], 10, 6 );
+            add_action( 'get_image_tag', [ $this, 'getImageTagOverride' ], 10, 6 );
             add_filter( 'wp_generate_attachment_metadata', [ $this, 'skipSvgRegeneration' ], 10, 2 );
             add_filter( 'wp_get_attachment_metadata', [ $this, 'metadataRrrorFix' ], 10, 2 );
             add_filter( 'wp_get_attachment_image_attributes', [ $this, 'fixDirectImageOutput' ], 10, 3 );
@@ -116,7 +116,7 @@ if ( ! class_exists( 'safeSvg' ) ) {
             $dirty = file_get_contents( $file );
 
             // Is the SVG gzipped? If so we try and decode the string
-            if ( $is_zipped = $this->is_gzipped( $dirty ) ) {
+            if ( $is_zipped = $this->isGzipped( $dirty ) ) {
                 $dirty = gzdecode( $dirty );
 
                 // If decoding fails, bail as we're not secure
@@ -176,7 +176,7 @@ if ( ! class_exists( 'safeSvg' ) ) {
         public function fixAdminPreview( $response, $attachment, $meta ) {
 
             if ( $response['mime'] == 'image/svg+xml' ) {
-                $dimensions = $this->svg_dimensions( get_attached_file( $attachment->ID ) );
+                $dimensions = $this->svgDimensions( get_attached_file( $attachment->ID ) );
 
                 if ( $dimensions ) {
                     $response = array_merge( $response, $dimensions );
@@ -282,7 +282,7 @@ if ( ! class_exists( 'safeSvg' ) ) {
                 if ( is_array( $size ) ) {
                     $width  = $size[0];
                     $height = $size[1];
-                } elseif ( 'full' == $size && $dimensions = $this->svg_dimensions( get_attached_file( $id ) ) ) {
+                } elseif ( 'full' == $size && $dimensions = $this->svgDimensions( get_attached_file( $id ) ) ) {
                     $width  = $dimensions['width'];
                     $height = $dimensions['height'];
                 } else {
@@ -322,7 +322,7 @@ if ( ! class_exists( 'safeSvg' ) ) {
                 $relative_path = str_replace( $upload_dir['basedir'], '', $svg_path );
                 $filename      = basename( $svg_path );
 
-                $dimensions = $this->svg_dimensions( $svg_path );
+                $dimensions = $this->svgDimensions( $svg_path );
 
                 if ( ! $dimensions ) {
                     return $metadata;
@@ -445,7 +445,7 @@ if ( ! class_exists( 'safeSvg' ) ) {
                 $default_height = 100;
                 $default_width  = 100;
 
-                $dimensions = $this->svg_dimensions( get_attached_file( $attachment->ID ) );
+                $dimensions = $this->svgDimensions( get_attached_file( $attachment->ID ) );
 
                 if ( $dimensions ) {
                     $default_height = $dimensions['height'];

@@ -8,5 +8,13 @@
             "email": "joeriabbo@hotmail.com",
             "homepage": "https://www.linkedin.com/in/joeri-abbo-43a457144/"
         }
-	]
+	],
+	"require-dev": {
+		"phpunit/phpunit": "^11"
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Tests\\": "tests/"
+		}
+	}
 }
